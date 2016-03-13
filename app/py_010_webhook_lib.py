@@ -46,38 +46,38 @@ def send():
     r = ds_recipe_lib.login()
     if (not r["ok"]):
         return r
-	ds_account_id = ds_recipe_lib.ds_account_id    
+    ds_account_id = ds_recipe_lib.ds_account_id    
 
     #
     # STEP 2 - Create and send envelope with eventNotification
     #
     webhook_url = ds_recipe_lib.get_base_url() + webhook_path
     event_notification = {"url": webhook_url,
-		"loggingEnabled": "true", # The api wants strings for true/false
-		"requireAcknowledgment": "true",
-		"useSoapInterface": "false",
-		"includeCertificateWithSoap": "false",
-		"signMessageWithX509Cert": "false",
-		"includeDocuments": "true",
-		"includeEnvelopeVoidReason": "true",
-		"includeTimeZone": "true",
-		"includeSenderAccountAsCustomField": "true",
-		"includeDocumentFields": "true",
-		"includeCertificateOfCompletion": "true",
-		"envelopeEvents": [ # for this recipe, we're requesting notifications
-			# for all envelope and recipient events
-			{"envelopeEventStatusCode": "sent"},
-		  	{"envelopeEventStatusCode": "delivered"},
-		  	{"envelopeEventStatusCode": "completed"},
-			{"envelopeEventStatusCode": "declined"},
-			{"envelopeEventStatusCode": "voided"}],
-		"recipientEvents": [
-			{"recipientEventStatusCode": "Sent"},
-			{"recipientEventStatusCode": "Delivered"},
-			{"recipientEventStatusCode": "Completed"},
-			{"recipientEventStatusCode": "Declined"},
-			{"recipientEventStatusCode": "AuthenticationFailed"},
-			{"recipientEventStatusCode": "AutoResponded"}]
+        "loggingEnabled": "true", # The api wants strings for true/false
+        "requireAcknowledgment": "true",
+        "useSoapInterface": "false",
+        "includeCertificateWithSoap": "false",
+        "signMessageWithX509Cert": "false",
+        "includeDocuments": "true",
+        "includeEnvelopeVoidReason": "true",
+        "includeTimeZone": "true",
+        "includeSenderAccountAsCustomField": "true",
+        "includeDocumentFields": "true",
+        "includeCertificateOfCompletion": "true",
+        "envelopeEvents": [ # for this recipe, we're requesting notifications
+            # for all envelope and recipient events
+            {"envelopeEventStatusCode": "sent"},
+              {"envelopeEventStatusCode": "delivered"},
+              {"envelopeEventStatusCode": "completed"},
+            {"envelopeEventStatusCode": "declined"},
+            {"envelopeEventStatusCode": "voided"}],
+        "recipientEvents": [
+            {"recipientEventStatusCode": "Sent"},
+            {"recipientEventStatusCode": "Delivered"},
+            {"recipientEventStatusCode": "Completed"},
+            {"recipientEventStatusCode": "Declined"},
+            {"recipientEventStatusCode": "AuthenticationFailed"},
+            {"recipientEventStatusCode": "AutoResponded"}]
     }
 
     # construct the body of the request
@@ -90,35 +90,35 @@ def send():
     docs = [{"documentId": "1", 
             "name": doc_document_name,
             "documentBase64": base64.b64encode(file_contents)}]
-	
+    
     signers = [{"email": ds_signer1_email,
-				"name": ds_signer1_name,
-				"recipientId": "1",
-				"routingOrder": "1",
-				"tabs": nda_fields()}]
+                "name": ds_signer1_name,
+                "recipientId": "1",
+                "routingOrder": "1",
+                "tabs": nda_fields()}]
     
     ccs = [{"email": ds_cc1_email,
-				"name": ds_cc1_name,
-				"recipientId": "2",
-				"routingOrder": "2"}]
-	
+            "name": ds_cc1_name,
+            "recipientId": "2",
+            "routingOrder": "2"}]
+    
     data = {"emailSubject": subject,
-		"documents": docs, 
-        "recipients": {"signers": signers, "carbonCopies": ccs},
-		"eventNotification": event_notification,
-		"status": "sent"
-	}
+            "documents": docs, 
+            "recipients": {"signers": signers, "carbonCopies": ccs},
+            "eventNotification": event_notification,
+            "status": "sent"
+    }
         
     # append "/envelopes" to the baseUrl and use in the request
     url = ds_recipe_lib.ds_base_url + "/envelopes"
     try:
         r = requests.post(url, headers=ds_recipe_lib.ds_headers, json=data)
     except requests.exceptions.RequestException as e:
-		return {'ok': False, 'msg': "Error calling Envelopes:create: " + str(e)}
+        return {'ok': False, 'msg': "Error calling Envelopes:create: " + str(e)}
         
     status = r.status_code
     if (status != 201): 
-		return ({'ok': False, 'msg': "Error calling DocuSign Envelopes:create, status is: " + str(status)})
+        return ({'ok': False, 'msg': "Error calling DocuSign Envelopes:create, status is: " + str(status)})
 
     data = r.json()
     envelope_id = data['envelopeId']
@@ -126,26 +126,26 @@ def send():
     
     # Instructions for reading the email
     html =  "<h2>Signature request sent!</h2>" + \
-			"<p>Envelope ID: " + envelope_id + "</p>" + \
-			"<p>Signer: " + ds_signer1_name + "</p>" + \
-			"<p>CC: " + ds_cc1_name + "</p>" + \
-			"<h2>Next steps</h2>" + \
-			"<h3>1. View the incoming notifications and documents</h3>" + \
-			"<p><a href='" + ds_recipe_lib.get_base_url() + "/files/" + envelope_id_to_dir(envelope_id) + "'" + \
-			"  class='btn btn-primary' role='button' target='_blank' style='margin-right:1.5em;'>" + \
-			"View Notification Files</a> (A new tab/window will be used.)</p>" + \
-			"<h3>2. Respond to the Signature Request</h3>"
+            "<p>Envelope ID: " + envelope_id + "</p>" + \
+            "<p>Signer: " + ds_signer1_name + "</p>" + \
+            "<p>CC: " + ds_cc1_name + "</p>" + \
+            "<h2>Next steps</h2>" + \
+            "<h3>1. View the incoming notifications and documents</h3>" + \
+            "<p><a href='" + ds_recipe_lib.get_base_url() + "/files/" + envelope_id_to_dir(envelope_id) + "'" + \
+            "  class='btn btn-primary' role='button' target='_blank' style='margin-right:1.5em;'>" + \
+            "View Notification Files</a> (A new tab/window will be used.)</p>" + \
+            "<h3>2. Respond to the Signature Request</h3>"
 
     ds_signer1_email_access = ds_recipe_lib.get_temp_email_access(ds_signer1_email)
     if (ds_signer1_email_access):
-		# A temp account was used for the email
-		html += "<p>Respond to the request via your mobile phone by using the QR code: </p>" + \
-				"<p>" + ds_recipe_lib.get_temp_email_access_qrcode(ds_signer1_email_access) + "</p>" + \
-				"<p> or via <a target='_blank' href='" + ds_signer1_email_access + "'>your web browser.</a></p>"
+        # A temp account was used for the email
+        html += "<p>Respond to the request via your mobile phone by using the QR code: </p>" + \
+                "<p>" + ds_recipe_lib.get_temp_email_access_qrcode(ds_signer1_email_access) + "</p>" + \
+                "<p> or via <a target='_blank' href='" + ds_signer1_email_access + "'>your web browser.</a></p>"
     else:
         # A regular email account was used
         html += "<p>Respond to the request via your mobile phone or other mail tool.</p>" + \
-				"<p>The email was sent to " + ds_signer1_name + " &lt;" + ds_signer1_email + "&gt;</p>"
+                "<p>The email was sent to " + ds_signer1_name + " &lt;" + ds_signer1_email + "&gt;</p>"
 
     html += "<p>Webhook url: " + webhook_url + "</p>"
 
@@ -159,18 +159,18 @@ def send():
         "ds_cc1_name": ds_cc1_name,
         "webhook_url": webhook_url,
         "html": html
-	}
+    }
 
 
 ########################################################################
 ########################################################################
 
-def	setup_output_dir(envelope_id):
+def    setup_output_dir(envelope_id):
 # setup output dir for the envelope
-	# Store the file. Create directories as needed
-	# Some systems might still not like files or directories to start with numbers.
-	# So we prefix the envelope ids with E and the timestamps with T
-	
+    # Store the file. Create directories as needed
+    # Some systems might still not like files or directories to start with numbers.
+    # So we prefix the envelope ids with E and the timestamps with T
+    
     # Make the envelope's directory
     
     envelope_dir = get_envelope_dir(envelope_id)
@@ -179,10 +179,10 @@ def	setup_output_dir(envelope_id):
     files_dir = os.path.join(os.getcwd(), xml_file_dir)
     shutil.copy(os.path.join(files_dir, readme), envelope_dir)
 
-def	get_envelope_dir(envelope_id):
-	# Some systems might still not like files or directories to start with numbers.
-	# So we prefix the envelope ids with E
-	
+def    get_envelope_dir(envelope_id):
+    # Some systems might still not like files or directories to start with numbers.
+    # So we prefix the envelope ids with E
+    
     # Make the envelope's directory
     files_dir = os.path.join(os.getcwd(), xml_file_dir)
     envelope_dir = os.path.join(files_dir, envelope_id_to_dir(envelope_id))
@@ -249,47 +249,47 @@ def webhook_listener():
 ########################################################################
 
 def nda_fields():
-	# The fields for the sample document "NDA"
-	# Create 4 fields, using anchors 
-	#   * signer1sig
-	#   * signer1name
-	#   * signer1company
-	#   * signer1date
-	fields = {
-	"signHereTabs": [{
-		"anchorString": "signer1sig",
-		"anchorXOffset": "0",
-	 	"anchorYOffset": "0",
-		"anchorUnits": "mms",
-		"recipientId": "1",
-		"name": "Please sign here",
-		"optional": "false",
-		"scaleValue": 1,
-		"tabLabel": "signer1sig"}],
-	"fullNameTabs": [{
-		"anchorString": "signer1name",
-	 	"anchorYOffset": "-6",
-		"fontSize": "Size12",
-		"recipientId": "1",
-		"tabLabel": "Full Name",
-		"name": "Full Name"}],
-	"textTabs": [{
-		"anchorString": "signer1company",
-	 	"anchorYOffset": "-8",
-		"fontSize": "Size12",
-		"recipientId": "1",
-		"tabLabel": "Company",
-		"name": "Company",
-		"required": "false"}],
-	"dateSignedTabs": [{
-		"anchorString": "signer1date",
-	 	"anchorYOffset": "-6",
-		"fontSize": "Size12",
-		"recipientId": "1",
-		"name": "Date Signed",
- 			"tabLabel": "Company"}]
-	}
-	return fields
+    # The fields for the sample document "NDA"
+    # Create 4 fields, using anchors 
+    #   * signer1sig
+    #   * signer1name
+    #   * signer1company
+    #   * signer1date
+    fields = {
+    "signHereTabs": [{
+        "anchorString": "signer1sig",
+        "anchorXOffset": "0",
+         "anchorYOffset": "0",
+        "anchorUnits": "mms",
+        "recipientId": "1",
+        "name": "Please sign here",
+        "optional": "false",
+        "scaleValue": 1,
+        "tabLabel": "signer1sig"}],
+    "fullNameTabs": [{
+        "anchorString": "signer1name",
+         "anchorYOffset": "-6",
+        "fontSize": "Size12",
+        "recipientId": "1",
+        "tabLabel": "Full Name",
+        "name": "Full Name"}],
+    "textTabs": [{
+        "anchorString": "signer1company",
+         "anchorYOffset": "-8",
+        "fontSize": "Size12",
+        "recipientId": "1",
+        "tabLabel": "Company",
+        "name": "Company",
+        "required": "false"}],
+    "dateSignedTabs": [{
+        "anchorString": "signer1date",
+         "anchorYOffset": "-6",
+        "fontSize": "Size12",
+        "recipientId": "1",
+        "name": "Date Signed",
+             "tabLabel": "Company"}]
+    }
+    return fields
 
 ########################################################################
 ########################################################################

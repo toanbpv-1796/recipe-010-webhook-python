@@ -1,14 +1,14 @@
 # DocuSign API Walkthrough 04 (PYTHON) - Add Signature Request to Document and Send
 #
 # Set encoding to utf8. See http://stackoverflow.com/a/21190382/64904 
-import sys; reload(sys); sys.setdefaultencoding('utf8')
+import sys
 
 import json, socket, certifi, requests, os, base64, re, urllib, shutil
 # See http://requests.readthedocs.org/ for information on the requests library
 # See https://urllib3.readthedocs.org/en/latest/security.html for info on making secure https calls
 # in particular, run pip install certifi periodically to pull in the latest cert bundle
 
-from lib_master_python import ds_recipe_lib
+from .lib_master_python import ds_recipe_lib
 from flask import request
 from bs4 import BeautifulSoup
 

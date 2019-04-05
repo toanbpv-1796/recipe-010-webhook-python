@@ -1,7 +1,8 @@
 # Python Utilities for DocuSign Recipes
 
 # Set encoding to utf8. See http:#stackoverflow.com/a/21190382/64904 
-import sys; reload(sys); sys.setdefaultencoding('utf8')
+import sys
+# import reload(sys); sys.setdefaultencoding('utf8')
 
 import json, certifi, requests, os, base64, math, string, urllib, random, time, re
 from flask import request
@@ -17,40 +18,39 @@ ds_integration_id = ""
 ds_account_id = ""
 ds_base_url = ""
 ds_headers = ""
-email_count = 2 # Used to make email addresses unique.
+email_count = 2  # Used to make email addresses unique.
 
 # Global constants
-ds_api_login_url = "https://demo.docusign.net/restapi/v2/login_information" # change for production
+ds_api_login_url = "https://demo.docusign.net/restapi/v2/login_information"  # change for production
 ca_bundle = "app/static/assets_master/ca-bundle.crt"
 temp_email_server = "mailinator.com" # Used for throw-away email addresses
-b64_pw_prefix="ZW5jb"
-b64_pw_clear_prefix="encoded"
+b64_pw_prefix = "ZW5jb"
+b64_pw_clear_prefix = "encoded"
 
-def init (arg_ds_user_email, arg_ds_user_pw, arg_ds_integration_id, arg_ds_account_id = None):
+
+def init(arg_ds_user_email, arg_ds_user_pw, arg_ds_integration_id, arg_ds_account_id=None):
     # if ds_account_id is null then the user's default account will be used
     # if ds_user_email is "***" then environment variables are used
     # Returns msg: None means no problem. Otherwise there is a problem
     
     global ds_user_email, ds_user_pw, ds_integration_id, ds_account_id, ds_base_url, ds_headers, email_count
-
-    if (arg_ds_user_email == "***"):
+    if arg_ds_user_email == "***":
         arg_ds_user_email = os.environ.get("DS_USER_EMAIL")
         arg_ds_user_pw = os.environ.get("DS_USER_PW")
         arg_ds_integration_id = os.environ.get("DS_INTEGRATION_ID")
         
-    if (not isinstance(arg_ds_user_email, basestring) or len(arg_ds_user_email) < 7):
-        return "No DocuSign login settings! " + \
-        "Either set in the script or use environment variables DS_USER_EMAIL, DS_USER_PW, and DS_INTEGRATION_ID"
+    if not isinstance(arg_ds_user_email, basestring) or len(arg_ds_user_email) < 7:
+        return '''No DocuSign login settings! " + \
+        "Either set in the script or use environment variables DS_USER_EMAIL, DS_USER_PW, and DS_INTEGRATION_ID"'''
         # If the environment variables are set, but it isn't working, check that the
         # your http:#us.php.net/manual/en/ini.core.php#ini.variables-order ini setting includes "E" in the string.
         # See http:#php.net/manual/en/reserved.variables.environment.php
 
-
     # Decode the pw if it is in base64
-    if (b64_pw_prefix == arg_ds_user_pw[:len(b64_pw_prefix)]):
+    if b64_pw_prefix == arg_ds_user_pw[:len(b64_pw_prefix)]:
         # it was encoded
         arg_ds_user_pw = base64.b64decode(arg_ds_user_pw)
-        arg_ds_user_pw = arg_ds_user_pw[len(b64_pw_clear_prefix):] # remove prefix
+        arg_ds_user_pw = arg_ds_user_pw[len(b64_pw_clear_prefix):]  # remove prefix
 
     ds_user_email = arg_ds_user_email
     ds_user_pw = arg_ds_user_pw
